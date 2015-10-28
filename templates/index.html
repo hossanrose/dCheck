@@ -5,17 +5,17 @@
 		<div class="col1">
 			<h3> Domain DNS info </h3>
 			{% for out_line in  dig %}
-			{{ out_line }}<br>
+			<i>{{ out_line }}</i><br>
 			{% else %}
 			<br>
-			Please enter a domain and click submit
+			Please enter a valid domainname and click submit
 			{% endfor %}
 			<h3> Domain header info </h3>
 			{% for out_line in  headers %}
 			{{ out_line }}<br>
 			{% else %}
 			<br>
-			Please enter a domain and click submit
+			Please enter a valid domainname and click submit
 		{% endfor %}
 		</div>
 		<div class="col2">
@@ -24,7 +24,7 @@
 			{{ out_line }}<br>
 			{% else %}
 			<br>
-			Please enter a domain and click submit
+			Please enter a valid domainname and click submit
 			{% endfor %}
 		</div>
 	</div>

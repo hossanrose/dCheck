@@ -41,6 +41,8 @@
 	#header h2 {
 		padding:.4em 15px 0 15px;
 		margin:0;
+		text-align: center;
+		margin: 0 auto;
 	}
 	#header ul {
 		clear:left;
@@ -90,6 +92,12 @@
 		margin:0;
 		padding:6px 15px !important;
 		text-align:right;
+	}
+	/* making search box rounded */
+	.rounded { 
+		border-radius:15px; 
+		-moz-border-radius:15px; 
+		-webkit-border-radius:15px; 
 	}
 	/* column container */
 	.colmask {

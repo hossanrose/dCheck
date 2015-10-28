@@ -10,14 +10,13 @@
 <body>
 <div id="header">
 	<form action="{{ url_for('index') }}" method=post >
-	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-        Domain : <input type=text size=30 name=domain>
-        <input type=submit value=check>
+	<h1> dCheck</h1>
+        <h2><input class=rounded type=text placeholder="Enter a domain.." size=30 name="domain"><input type=submit value=check></h2>
 	</form>  
 </div>
   {% block body %}{% endblock %}
 <div id="footer">
-	<p>Coded and build by <a href="http://yoman.in">Hossan Rose</a>.Layout by<a href="http://matthewjamestaylor.com/blog/perfect-2-column-double-page.htm">Matthew James Taylor</a>.</p>
+	<p>Coded and build by <a href="http://yoman.in">Hossan Rose</a>. Layout from <a href="http://matthewjamestaylor.com/blog/perfect-2-column-double-page.htm">Matthew James Taylor</a>.</p>
 </div>
 </body>
 </html>
