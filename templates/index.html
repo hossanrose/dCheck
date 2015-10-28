@@ -1,42 +1,33 @@
-<!doctype html>
-<title>dCheck</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<form action="{{ url_for('index') }}" method=post >
-        Domain : <input type=text size=30 name=domain>
-<select name="record">
-  <option value=>dig</option>
-  <option value="A">A</option>
-  <option value="MX">MX</option>
-  <option value="NS">NS</option>
-  <option value="TXT">TXT</option>
-</select>
-     <input type=submit value=execute>
-</form>
-</br>
-<div id=boxer>
-<div class="console left-float">
-<h3> Domain DNS info </h3>
-{% for out_line in  dig %}
-     {{ out_line }}<br>
-  {% else %}
-<br>
-    Please enter a domain and click submit
-  {% endfor %}
-<h3> Domain header info </h3>
-{% for out_line in  headers %}
-     {{ out_line }}<br>
-  {% else %}
-<br>
-    Please enter a domain and click submit
-  {% endfor %}
+{% extends "layout.html" %}
+{% block body %}
+<div class="colmask doublepage">
+	<div class="colleft">
+		<div class="col1">
+			<h3> Domain DNS info </h3>
+			{% for out_line in  dig %}
+			{{ out_line }}<br>
+			{% else %}
+			<br>
+			Please enter a domain and click submit
+			{% endfor %}
+			<h3> Domain header info </h3>
+			{% for out_line in  headers %}
+			{{ out_line }}<br>
+			{% else %}
+			<br>
+			Please enter a domain and click submit
+		{% endfor %}
+		</div>
+		<div class="col2">
+			<h3> Domain registrar info </h3>
+			{% for out_line in  whois %}
+			{{ out_line }}<br>
+			{% else %}
+			<br>
+			Please enter a domain and click submit
+			{% endfor %}
+		</div>
+	</div>
 </div>
-<div class="console right-float">
-<h3> Domain registrar info </h3>
-{% for out_line in  whois %}
-     {{ out_line }}<br>
-  {% else %}
-<br>
-    Please enter a domain and click submit
-  {% endfor %}
-</div> 
-</div> 
+{% endblock %}
+

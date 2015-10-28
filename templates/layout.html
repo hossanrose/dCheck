@@ -1,18 +1,23 @@
-<!doctype html>
-<title>Control Panel</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<div id="boxed">
-  <h1 class="left-float"><a href = {{ url_for('index')}}>Panel<a/> </h1>
-<p class="right-float">
-  {% if not session.logged_in %}
-    <a href="{{ url_for('login') }}">log in</a>
-  {% else %}
-    <a href="{{ url_for('logout') }}">log out</a>
-  {% endif %}
-</p>
-<div style="clear: both;"></div>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<head>
+	<title>dCheck Tool</title>
+	<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+	<meta name="description" content="Domain check tool" />
+	<meta name="keywords" content="Domain check, whois, header info, DNS" />
+	<meta name="robots" content="index, follow" />
+	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div id="header">
+	<form action="{{ url_for('index') }}" method=post >
+	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+        Domain : <input type=text size=30 name=domain>
+        <input type=submit value=check>
+	</form>  
 </div>
-  {% for message in get_flashed_messages() %}
-  {{ message }}
-  {% endfor %}
   {% block body %}{% endblock %}
+<div id="footer">
+	<p>Coded and build by <a href="http://yoman.in">Hossan Rose</a>.Layout by<a href="http://matthewjamestaylor.com/blog/perfect-2-column-double-page.htm">Matthew James Taylor</a>.</p>
+</div>
+</body>
+</html>
