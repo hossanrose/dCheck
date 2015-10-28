@@ -1,0 +1,5 @@
+#boxed  {border: 2px solid green ;}
+.right-float  {float:right}
+.left-float  {float:left}
+.console {font-family:Courier bold; color: #CCCCCC; background: #000000;float:middle; width:500px; padding: 2px;}
+h3   {color:red}

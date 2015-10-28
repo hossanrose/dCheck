@@ -1,0 +1,1 @@
+SERVER='server.yoman.in'
