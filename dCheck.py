@@ -27,11 +27,19 @@ def exec_dig(domain,records):
 			if p.match(outline):
 				new_out.append(outline)
 	return new_out
+
 #Check the domains whois enteries
 def domain_check(domain):
 	output=exec_cmd(['/usr/bin/whois',domain])
 	#print output
-	return output
+	match_string='^\s*(Regist|Name Server:|Updat|Creat|Expir|Last|Admin)'
+	p =re.compile(match_string)
+	print match_string, p
+	new_out=[]
+	for outline in output:
+		if p.match(outline):
+			new_out.append(outline)
+	return sorted(new_out)
 
 # Check the domains headers
 def curl_check(domain):
@@ -53,4 +61,4 @@ def index():
     return render_template('index.html' ) 
 
 if __name__ == "__main__":
-	app.run(DEBUG=True,host='0.0.0.0')
+	app.run(host='0.0.0.0')
