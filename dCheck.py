@@ -1,18 +1,17 @@
 #!env/bin/python
 
 from flask import Flask, session, redirect, url_for, escape, request, flash, render_template, abort
-import subprocess, shlex
-import re
+import subprocess, shlex, re
 
 app = Flask(__name__)
 app.config.from_object('config')
 
 #command execution
 def exec_cmd(command):
-	print command
+	print (command)
 	run = subprocess.Popen(command, stdout = subprocess.PIPE,stderr=subprocess.PIPE)
 	stdout,stderr = run.communicate()
-	print(stdout, stderr)
+	#print(stdout, stderr)
 	output=stdout.splitlines()
 	return output
 def exec_dig(domain,records):
@@ -21,7 +20,7 @@ def exec_dig(domain,records):
 	print match_string, p
 	new_out=[]
 	for record in records:
-		command=['dig',record, domain]
+		command=['/usr/bin/dig',record, domain]
 		output=exec_cmd(command)
 		new_out.append("--------------"+record+ " record--------------")
 		for outline in output:
@@ -30,14 +29,14 @@ def exec_dig(domain,records):
 	return new_out
 #Check the domains whois enteries
 def domain_check(domain):
-	output=exec_cmd(['whois',domain])
-	print output
+	output=exec_cmd(['/usr/bin/whois',domain])
+	#print output
 	return output
 
 # Check the domains headers
 def curl_check(domain):
-	output=exec_cmd(['curl','-I',domain])
-	print output
+	output=exec_cmd(['/usr/bin/curl','-I',domain])
+	#print output
 	return output
      
 #iptools
@@ -48,8 +47,10 @@ def index():
         records=['A','MX','TXT','NS']
         dig=exec_dig(domain,records)
         whois=domain_check(domain)
+        #print whois
         headers=curl_check(domain)
         return render_template('index.html', dig=dig,whois=whois,headers=headers)
     return render_template('index.html' ) 
 
-app.run(debug=True, host=app.config['SERVER'])
+if __name__ == "__main__":
+	app.run(DEBUG=True,host='0.0.0.0')
