@@ -16,7 +16,14 @@
 			{% else %}
 			<br>
 			Please enter a valid domainname and click submit
-		{% endfor %}
+			{% endfor %}
+			<h3> IP info </h3>
+			{% for out_line in  ipinfo %}
+			{{ out_line }}<br>
+			{% else %}
+			<br>
+			Please enter a valid domainname and click submit
+			{% endfor %}
 		</div>
 		<div class="col2">
 			<h3> Domain registrar info </h3>
@@ -30,4 +37,3 @@
 	</div>
 </div>
 {% endblock %}
-
