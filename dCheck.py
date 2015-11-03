@@ -7,9 +7,9 @@ app = Flask(__name__)
 app.config.from_object('config')
 
 class dCheck(object):
-	def __init__(self,domain,records):
+	RECORDS=['A','MX','TXT','NS']
+	def __init__(self,domain):
 		self.domain=domain
-		self.records=records
 
 #command execution
 	def exec_cmd(self,command):
@@ -19,13 +19,13 @@ class dCheck(object):
 		#print(stdout, stderr)
 		output=stdout.splitlines()
 		return output
-
+#Dig function for different records
 	def exec_dig(self):
 		match_string='^' + self.domain+'\s*'+'[0-9]*'+'\s*'
 		p =re.compile(match_string)
 		print match_string, p
 		new_out=[]
-		for record in self.records:
+		for record in self.RECORDS:
 			command=['/usr/bin/dig',record, self.domain]
 			output=self.exec_cmd(command)
 			new_out.append("--------------"+record+ " record--------------")
@@ -49,7 +49,7 @@ class dCheck(object):
 
 # Check the domains headers
 	def curl_check(self):
-		output=self.exec_cmd(['/usr/bin/curl','-I',self.domain])
+		output=self.exec_cmd(['/usr/bin/curl','-I','-m', '5',self.domain])
 		#print output
 		return output
 
@@ -57,7 +57,7 @@ class dCheck(object):
 	def ip_check(self):
 		ip=socket.gethostbyname(self.domain) 
 		output=self.exec_cmd(['/usr/bin/whois',ip])
-		match_string='^(OrgName:|Address:|City:|StateProv:|PostalCode:|Country:)'
+		match_string='^(irt:|OrgName:|address:|Address:|City:|StateProv:|PostalCode:|country:|Country:)'
         	p =re.compile(match_string)
 		print match_string, p
         	new_out=[]
@@ -65,6 +65,19 @@ class dCheck(object):
                 	if p.match(outline):
                         	new_out.append(outline)
 		return new_out
+# Check ports
+	def nmap_check(self):
+		output=self.exec_cmd(['/usr/bin/nmap', '-F', self.domain])
+		#print output
+		match_string='(nmap|Nmap)'
+		p =re.compile(match_string)
+                print match_string, p
+		new_out=[]
+                for outline in output:
+                        if not p.search(outline):
+                                new_out.append(outline)
+                return new_out
+
 #Main function call
 	def main_check(self):
 		output=[]
@@ -72,22 +85,22 @@ class dCheck(object):
         	output.append(self.domain_check())
         	output.append(self.curl_check())
         	output.append(self.ip_check())
+		output.append(self.nmap_check())
 		return output
 #iptools
 @app.route('/<domain>')
 @app.route('/', methods=['GET', 'POST'])
 def index(domain=None):
-    records=['A','MX','TXT','NS']
-    if request.method == 'POST':
-        domain = request.form['domain']
-	call=dCheck(domain,records)
-	output=call.main_check()
-        return render_template('index.html', dig=output[0],whois=output[1],headers=output[2],ipinfo=output[3])
-    if (not domain == None):
-        call=dCheck(domain,records)
-        output=call.main_check()
-        return render_template('index.html', dig=output[0],whois=output[1],headers=output[2],ipinfo=output[3])
-    return render_template('index.html') 
+	if request.method == 'POST':
+		domain = request.form['domain']
+		call=dCheck(domain)
+		output=call.main_check()
+		return render_template('index.html', dig=output[0],whois=output[1],headers=output[2],ipinfo=output[3],nmap=output[4])
+	if (not domain == None):
+		call=dCheck(domain)
+		output=call.main_check()
+		return render_template('index.html', dig=output[0],whois=output[1],headers=output[2],ipinfo=output[3],nmap=output[4])
+	return render_template('index.html') 
 
 if __name__ == "__main__":
 	app.run(debug=True,host='0.0.0.0')
