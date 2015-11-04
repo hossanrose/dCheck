@@ -19,19 +19,37 @@ class dCheck(object):
 		#print(stdout, stderr)
 		output=stdout.splitlines()
 		return output
-#Dig function for different records
-	def exec_dig(self):
-		match_string='^' + self.domain+'\s*'+'[0-9]*'+'\s*'
+#Check if A record is present
+
+	def dig_A(self):
+		match_string='^' +self.domain+'.(\\t)*[0-9]*(\\t)*IN(\\t)*A'
 		p =re.compile(match_string)
 		print match_string, p
+		command=['/usr/bin/dig','A',self.domain]
+		output=self.exec_cmd(command)
+		print output
 		new_out=[]
+		for outline in output:
+                                if p.match(outline):
+					new_out.append(outline)
+		return new_out
+			
+#Dig function for different records
+	def exec_dig(self):
+		new_out=[]
+		self.dic_rec={}
 		for record in self.RECORDS:
 			command=['/usr/bin/dig',record, self.domain]
+			match_string='^' +self.domain+'.(\\t)*[0-9]*(\\t)*IN(\\t)*'+record
+			p =re.compile(match_string)
+			print match_string, p
 			output=self.exec_cmd(command)
 			new_out.append("--------------"+record+ " record--------------")
 			for outline in output:
 				if p.match(outline):
 					new_out.append(outline)
+					self.dic_rec[record]=outline
+		print self.dic_rec
 		return new_out
 
 #Check the domains whois enteries
@@ -49,33 +67,42 @@ class dCheck(object):
 
 # Check the domains headers
 	def curl_check(self):
-		output=self.exec_cmd(['/usr/bin/curl','-I','-m', '5',self.domain])
+		if 'A' not in self.dic_rec:
+			output = ["No website detected: A record missing"]
+		else:
+			output=self.exec_cmd(['/usr/bin/curl','-I','-m', '5',self.domain])
 		#print output
 		return output
 
 # Check IP information
 	def ip_check(self):
-		ip=socket.gethostbyname(self.domain) 
-		output=self.exec_cmd(['/usr/bin/whois',ip])
-		match_string='^(irt:|OrgName:|address:|Address:|City:|StateProv:|PostalCode:|country:|Country:)'
-        	p =re.compile(match_string)
-		print match_string, p
-        	new_out=[]
-        	for outline in output:
-                	if p.match(outline):
-                        	new_out.append(outline)
+		if 'A' not in self.dic_rec:
+                        new_out = ["Domain not resolving to an IP"]
+                else:
+			ip=socket.gethostbyname(self.domain) 
+			output=self.exec_cmd(['/usr/bin/whois',ip])
+			match_string='^(irt:|OrgName:|address:|Address:|City:|StateProv:|PostalCode:|country:|Country:)'
+        		p =re.compile(match_string)
+			print match_string, p
+        		new_out=[]
+        		for outline in output:
+                		if p.match(outline):
+                        		new_out.append(outline)
 		return new_out
 # Check ports
 	def nmap_check(self):
-		output=self.exec_cmd(['/usr/bin/nmap', '-F', self.domain])
-		#print output
-		match_string='(nmap|Nmap)'
-		p =re.compile(match_string)
-                print match_string, p
-		new_out=[]
-                for outline in output:
-                        if not p.search(outline):
-                                new_out.append(outline)
+		if 'A' not in self.dic_rec:
+                        new_out = ["No A record found for port check"]
+		else:
+			output=self.exec_cmd(['/usr/bin/nmap', '-F', self.domain])
+			#print output
+			match_string='(nmap|Nmap)'
+			p =re.compile(match_string)
+                	print match_string, p
+			new_out=[]
+                	for outline in output:
+                        	if not p.search(outline):
+                                	new_out.append(outline)
                 return new_out
 
 #Main function call
