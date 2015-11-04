@@ -19,25 +19,24 @@ class dCheck(object):
 		#print(stdout, stderr)
 		output=stdout.splitlines()
 		return output
-#Check if A record is present
 
-	def dig_A(self):
+#Dig for A record
+	def exec_dig_A(self):
+		command=['/usr/bin/dig','A',self.domain]
 		match_string='^' +self.domain+'.(\\t)*[0-9]*(\\t)*IN(\\t)*A'
 		p =re.compile(match_string)
-		print match_string, p
-		command=['/usr/bin/dig','A',self.domain]
 		output=self.exec_cmd(command)
-		print output
 		new_out=[]
 		for outline in output:
-                                if p.match(outline):
-					new_out.append(outline)
-		return new_out
-			
+			if p.match(outline):
+				the_rec=re.split(r'\t+',outline)
+				new_out.append(the_rec[-1])
+		return new_out	
+
 #Dig function for different records
 	def exec_dig(self):
 		new_out=[]
-		self.dic_rec={}
+		dic_dig={}
 		for record in self.RECORDS:
 			command=['/usr/bin/dig',record, self.domain]
 			match_string='^' +self.domain+'.(\\t)*[0-9]*(\\t)*IN(\\t)*'+record
@@ -45,12 +44,16 @@ class dCheck(object):
 			print match_string, p
 			output=self.exec_cmd(command)
 			new_out.append("--------------"+record+ " record--------------")
+			#Intialize a list for each record, so that mulitple results for same record can be saved
 			for outline in output:
 				if p.match(outline):
 					new_out.append(outline)
-					self.dic_rec[record]=outline
-		print self.dic_rec
-		return new_out
+					#Uses regular expression to split the string based on tab
+					the_rec=re.split(r'\t+',outline)
+					value=''.join(the_rec[-1])
+					dic_dig.setdefault(record,[]).append(value)
+		print dic_dig
+		return (new_out,dic_dig)
 
 #Check the domains whois enteries
 	def domain_check(self):
@@ -60,23 +63,35 @@ class dCheck(object):
 		p =re.compile(match_string)
 		print match_string, p
 		new_out=[]
+		dic_whois={}
 		for outline in output:
 			if p.match(outline):
 				new_out.append(outline)
-		return sorted(new_out)
+				the_rec=outline.split(':')
+				value=''.join(the_rec[1:])
+				# setdefault menthod will append if the key already
+				dic_whois.setdefault(the_rec[0],[]).append(value)
+		#print dic_whois
+		return (sorted(new_out),dic_whois)
 
 # Check the domains headers
 	def curl_check(self):
-		if 'A' not in self.dic_rec:
+		dic_curl={}
+		if self.dig_A ==[]:
 			output = ["No website detected: A record missing"]
 		else:
 			output=self.exec_cmd(['/usr/bin/curl','-I','-m', '5',self.domain])
-		#print output
-		return output
+			for outline in output:
+				the_rec=outline.split(':')
+				value=''.join(the_rec[1:])	
+				dic_curl.setdefault(the_rec[0],[]).append(value)
+		print dic_curl
+		return (output,dic_curl)
 
 # Check IP information
 	def ip_check(self):
-		if 'A' not in self.dic_rec:
+		dic_ip={}
+		if self.dig_A ==[]:
                         new_out = ["Domain not resolving to an IP"]
                 else:
 			ip=socket.gethostbyname(self.domain) 
@@ -88,10 +103,16 @@ class dCheck(object):
         		for outline in output:
                 		if p.match(outline):
                         		new_out.append(outline)
-		return new_out
+					the_rec=outline.split(':')
+					value=''.join(the_rec[1:])
+					dic_ip.setdefault(the_rec[0],[]).append(value)
+		print dic_ip
+		return (new_out,dic_ip)
+
 # Check ports
 	def nmap_check(self):
-		if 'A' not in self.dic_rec:
+		dic_nmap={}
+		if self.dig_A ==[]:
                         new_out = ["No A record found for port check"]
 		else:
 			output=self.exec_cmd(['/usr/bin/nmap', '-F', self.domain])
@@ -103,17 +124,20 @@ class dCheck(object):
                 	for outline in output:
                         	if not p.search(outline):
                                 	new_out.append(outline)
-                return new_out
+                return (new_out,dic_nmap)
 
 #Main function call
 	def main_check(self):
 		output=[]
-		output.append(self.exec_dig())
-        	output.append(self.domain_check())
-        	output.append(self.curl_check())
-        	output.append(self.ip_check())
-		output.append(self.nmap_check())
+		self.dig_A=self.exec_dig_A()
+		print self.dig_A
+		output.append(self.exec_dig()[0])
+        	output.append(self.domain_check()[0])
+        	output.append(self.curl_check()[0])
+        	output.append(self.ip_check()[0])
+		output.append(self.nmap_check()[0])
 		return output
+
 #iptools
 @app.route('/<domain>')
 @app.route('/', methods=['GET', 'POST'])
