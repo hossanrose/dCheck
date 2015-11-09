@@ -15,8 +15,8 @@ dCheck pulls information using commands *dig/whois/curl/nmap* to display domain 
 5. Javascript validation 
 
 ###API's
-  * api/dig/<domain>
-  * api/whois/<domain>
-  * api/header/<domain>
-  * api/ip/<domain>
-  * api/nmap/<domain>
+  * api/dig/**domain**
+  * api/whois/**domain**
+  * api/header/**domain**
+  * api/ip/**domain**
+  * api/nmap/**domain**
