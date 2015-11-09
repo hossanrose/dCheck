@@ -1,6 +1,6 @@
 #!env/bin/python
 
-from flask import Flask, session, redirect, url_for, escape, request, flash, render_template, abort
+from flask import Flask, session, redirect, url_for, escape, request, flash, render_template, abort,jsonify
 import subprocess, shlex, re, socket
 
 app = Flask(__name__)
@@ -137,6 +137,27 @@ class dCheck(object):
         	output.append(self.ip_check()[0])
 		output.append(self.nmap_check()[0])
 		return output
+#JSON calls
+	def dig_check_json(self):
+		self.dig_A=self.exec_dig_A()
+                print self.dig_A
+		return self.exec_dig()[1]	
+	def whois_check_json(self):
+		self.dig_A=self.exec_dig_A()
+                print self.dig_A
+		return self.domain_check()[1]	
+	def curl_check_json(self):
+		self.dig_A=self.exec_dig_A()
+                print self.dig_A
+		return self.curl_check()[1]	
+	def ip_check_json(self):
+		self.dig_A=self.exec_dig_A()
+                print self.dig_A
+		return self.ip_check()[1]	
+	def nmap_check_json(self):
+		self.dig_A=self.exec_dig_A()
+                print self.dig_A
+		return self.nmap_check()[0]	
 
 #iptools
 @app.route('/<domain>')
@@ -153,5 +174,35 @@ def index(domain=None):
 		return render_template('index.html', dig=output[0],whois=output[1],headers=output[2],ipinfo=output[3],nmap=output[4])
 	return render_template('index.html') 
 
+@app.route('/api/dig/<domain>', methods=['GET'])
+def dig_json(domain):
+	call=dCheck(domain)
+	output=call.dig_check_json()
+    	return jsonify({domain: output})
+	
+@app.route('/api/whois/<domain>', methods=['GET'])
+def whois_json(domain):
+	call=dCheck(domain)
+	output=call.whois_check_json()
+    	return jsonify({domain: output})
+
+@app.route('/api/header/<domain>', methods=['GET'])
+def curl_json(domain):
+	call=dCheck(domain)
+	output=call.curl_check_json()
+    	return jsonify({domain: output})
+
+@app.route('/api/ip/<domain>', methods=['GET'])
+def ip_json(domain):
+        call=dCheck(domain)
+        output=call.ip_check_json()
+        return jsonify({domain: output})
+
+
+@app.route('/api/nmap/<domain>', methods=['GET'])
+def nmap_json(domain):
+        call=dCheck(domain)
+        output=call.nmap_check_json()
+        return jsonify({domain: output})
 if __name__ == "__main__":
 	app.run(debug=True,host='0.0.0.0')
