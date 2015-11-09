@@ -13,3 +13,10 @@ dCheck pulls information using commands *dig/whois/curl/nmap* to display domain 
   * Port information
 4. Output from commands is filtered to give the desired results only
 5. Javascript validation 
+
+###API's
+  * api/dig/<domain>
+  * api/whois/<domain>
+  * api/header/<domain>
+  * api/ip/<domain>
+  * api/nmap/<domain>
